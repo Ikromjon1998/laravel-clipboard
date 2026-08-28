@@ -10,7 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "ikromjon/laravel-clipboard-core": "^0.1",
+        "ikromjon/laravel-clipboard-core": "^0.2",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "nativephp/desktop": "^2.2"
@@ -60,7 +60,8 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan native:install --force --quiet ",
-            "@php scripts/ensure-nativephp-yauzl.php"
+            "@php scripts/ensure-nativephp-yauzl.php",
+            "@php scripts/build-clipboard-probe.php"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -81,7 +82,11 @@
             "@php scripts/ensure-nativephp-yauzl.php"
         ],
         "post-install-cmd": [
-            "@php scripts/ensure-nativephp-yauzl.php"
+            "@php scripts/ensure-nativephp-yauzl.php",
+            "@php scripts/build-clipboard-probe.php"
+        ],
+        "build:probe": [
+            "@php scripts/build-clipboard-probe.php"
         ]
     },
     "extra": {

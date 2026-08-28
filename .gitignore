@@ -25,3 +25,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Built from native/ClipboardProbe.swift by composer build:probe
+/bin/clipboard-probe

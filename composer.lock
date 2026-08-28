@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f6d2f7c96f54caa7943e9c19a8bf950",
+    "content-hash": "1105bbf29a78fffaad15b484be2e081d",
     "packages": [
         {
             "name": "brick/math",
@@ -1056,16 +1056,16 @@
         },
         {
             "name": "ikromjon/laravel-clipboard-core",
-            "version": "v0.1.1",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Ikromjon1998/laravel-clipboard-core.git",
-                "reference": "89f8d2e90356f6435e46734211cb3a8996cc3d13"
+                "reference": "f9d0eeca599c37c27a843419df689e0ec2e436c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Ikromjon1998/laravel-clipboard-core/zipball/89f8d2e90356f6435e46734211cb3a8996cc3d13",
-                "reference": "89f8d2e90356f6435e46734211cb3a8996cc3d13",
+                "url": "https://api.github.com/repos/Ikromjon1998/laravel-clipboard-core/zipball/f9d0eeca599c37c27a843419df689e0ec2e436c7",
+                "reference": "f9d0eeca599c37c27a843419df689e0ec2e436c7",
                 "shasum": ""
             },
             "require": {
@@ -1118,9 +1118,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Ikromjon1998/laravel-clipboard-core/issues",
-                "source": "https://github.com/Ikromjon1998/laravel-clipboard-core/tree/v0.1.1"
+                "source": "https://github.com/Ikromjon1998/laravel-clipboard-core/tree/v0.2.0"
             },
-            "time": "2026-08-28T23:27:20+00:00"
+            "time": "2026-08-28T23:39:02+00:00"
         },
         {
             "name": "laravel/framework",

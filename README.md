@@ -4,7 +4,7 @@ A lightweight, keyboard-first clipboard history manager for the macOS menu bar �
 
 Press <kbd>⌘⇧V</kbd>, a palette appears under your cursor, you type a few characters, hit <kbd>↩</kbd>, and the clip is back on your clipboard. That is the whole product.
 
-> **Status: in development.** The engine, tray, hotkey, palette, pinning and history all work; settings, onboarding and packaging do not exist yet. There is no release to download.
+> **Status: in development.** The engine, tray, hotkey, palette, pinning, search, settings and password-manager exclusion all work. Packaging does not — there is no signed release to download yet, so for now you run it from source.
 
 ## Why it exists
 
@@ -20,16 +20,20 @@ The clipboard engine lives in its own package, [`laravel-clipboard-core`](https:
 - Pinned clips are exempt from pruning
 - Filters as you type, entirely in memory — no request between keystroke and result
 - Lives in the menu bar with no dock icon
+- Skips anything a password manager marks as concealed, so those copies are never stored
+- Pause capture from the tray, and choose your own summon shortcut
 
 ### Honest limitations
 
 - **Memory.** This is Electron plus PHP. It idles at a fraction of a percent of CPU, but it will never be as small in RAM as a native Swift app like [Maccy](https://github.com/p0deje/Maccy). If RAM is your binding constraint, use a native app — that recommendation is not a joke.
-- **Passwords.** Guards drop clips before anything reaches disk, and the nspasteboard concealed-type convention is honoured *if the source reports it* — but Electron cannot read custom pasteboard types, so today that convention is effectively unenforced. A native helper is planned. Until then, use the pause control around anything sensitive.
-- **Polling.** macOS exposes no clipboard-change notification, so the watcher polls (250 ms–1 s, adaptive). A clip replaced faster than the current interval can be missed.
+- **Passwords.** Copies from password managers are not recorded. A small native helper (`native/ClipboardProbe.swift`, built automatically on install) reads the [nspasteboard](https://nspasteboard.org) concealed-type markers that Electron cannot see, and never emits the text of a concealed item — so it does not reach PHP at all. This depends on the source application marking its contents correctly, which the major password managers do. If the helper cannot be built, the app still runs but that protection is gone, and it says so during install.
+- **Polling.** macOS exposes no clipboard-change notification, so something must poll. With the native helper this is a `changeCount` comparison every 150 ms — a single integer, nothing read until it moves — so a clip has to be replaced within about a sixth of a second to be missed.
 
 ## Requirements
 
 macOS 12 or later, PHP 8.3+, Composer, Node 20+.
+
+Xcode Command Line Tools (`xcode-select --install`) are needed to build the pasteboard helper. Without them the app still installs and runs; it just cannot exclude password managers.
 
 The clipboard engine is a published package — [`ikromjon/laravel-clipboard-core`](https://packagist.org/packages/ikromjon/laravel-clipboard-core) — so `composer install` pulls it like any other dependency.
 
