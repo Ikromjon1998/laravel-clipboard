@@ -10,7 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "ikromjon/laravel-clipboard-core": "@dev",
+        "ikromjon/laravel-clipboard-core": "^0.1",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "nativephp/desktop": "^2.2"
@@ -99,12 +99,5 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "name": "clipboard-core",
-            "type": "path",
-            "url": "../laravel-clipboard-core"
-        }
-    ]
+    "prefer-stable": true
 }

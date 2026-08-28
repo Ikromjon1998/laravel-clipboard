@@ -31,13 +31,7 @@ The clipboard engine lives in its own package, [`laravel-clipboard-core`](https:
 
 macOS 12 or later, PHP 8.3+, Composer, Node 20+.
 
-Until `laravel-clipboard-core` is published to Packagist, `composer.json` resolves it through a path repository, so clone both repositories as siblings:
-
-```
-your-code/
-├── laravel-clipboard
-└── laravel-clipboard-core
-```
+The clipboard engine is a published package — [`ikromjon/laravel-clipboard-core`](https://packagist.org/packages/ikromjon/laravel-clipboard-core) — so `composer install` pulls it like any other dependency.
 
 ## Getting it running
 

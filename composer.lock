@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ba99c4432f02565b98f29c5f37eb90e",
+    "content-hash": "9f6d2f7c96f54caa7943e9c19a8bf950",
     "packages": [
         {
             "name": "brick/math",
@@ -1056,22 +1056,28 @@
         },
         {
             "name": "ikromjon/laravel-clipboard-core",
-            "version": "dev-main",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Ikromjon1998/laravel-clipboard-core.git",
+                "reference": "ee4069951575ffe94a87fe1ec85ce7e36ce02701"
+            },
             "dist": {
-                "type": "path",
-                "url": "../laravel-clipboard-core",
-                "reference": "728bc994bfad4b49286d3fed660353c59dff4d13"
+                "type": "zip",
+                "url": "https://api.github.com/repos/Ikromjon1998/laravel-clipboard-core/zipball/ee4069951575ffe94a87fe1ec85ce7e36ce02701",
+                "reference": "ee4069951575ffe94a87fe1ec85ce7e36ce02701",
+                "shasum": ""
             },
             "require": {
-                "illuminate/console": "^11.0||^12.0||^13.0",
-                "illuminate/database": "^11.0||^12.0||^13.0",
-                "illuminate/support": "^11.0||^12.0||^13.0",
+                "illuminate/console": "^12.0||^13.0",
+                "illuminate/database": "^12.0||^13.0",
+                "illuminate/support": "^12.0||^13.0",
                 "php": "^8.3"
             },
             "require-dev": {
                 "larastan/larastan": "^3.0",
                 "laravel/pint": "^1.28",
-                "orchestra/testbench": "^9.0||^10.0||^11.0",
+                "orchestra/testbench": "^10.0||^11.0",
                 "pestphp/pest": "^3.0",
                 "phpstan/phpstan": "^2.0"
             },
@@ -1091,28 +1097,7 @@
                     "Ikromjon\\ClipboardCore\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Ikromjon\\ClipboardCore\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "vendor/bin/pest"
-                ],
-                "test:coverage": [
-                    "vendor/bin/pest --coverage"
-                ],
-                "lint": [
-                    "vendor/bin/pint"
-                ],
-                "lint:test": [
-                    "vendor/bin/pint --test"
-                ],
-                "analyse": [
-                    "vendor/bin/phpstan analyse"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1131,9 +1116,11 @@
                 "laravel",
                 "nativephp"
             ],
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/Ikromjon1998/laravel-clipboard-core/issues",
+                "source": "https://github.com/Ikromjon1998/laravel-clipboard-core/tree/v0.1.0"
+            },
+            "time": "2026-08-28T23:15:09+00:00"
         },
         {
             "name": "laravel/framework",
@@ -8719,9 +8706,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "ikromjon/laravel-clipboard-core": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
