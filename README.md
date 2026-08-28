@@ -62,16 +62,17 @@ cd vendor/nativephp/desktop/resources/electron
 npm install-scripts approve electron esbuild fsevents
 ```
 
-**3. The bundled PHP binary can be extracted truncated.** `vendor/nativephp/desktop/resources/electron/php.js` unzips the static PHP binary through a streaming pipe and sets its permissions in the stream's close handler. If the process exits before that flushes, you get a short, non-executable binary and Electron dies with `spawn … EACCES`. Extracting synchronously fixes it:
+**3. The bundled PHP binary can be extracted truncated (`spawn … EACCES`).** NativePHP unzips the static PHP binary with yauzl, and **yauzl 3.2.0 stalls partway through a large deflated entry** — it stops emitting data and never fires `end`, `error` or `close`. Because the file mode is set inside that `close` handler, the binary is left both short and non-executable, so Electron cannot spawn it. The error names permissions, but the cause is extraction.
 
-```js
-// after ensureDirSync(binaryDestDir), before the yauzl block
-execFileSync('ditto', ['-xk', binarySrcDir, binaryDestDir], { stdio: 'inherit' })
-fs.chmodSync(join(binaryDestDir, platform.phpBinary), 0o755)
-process.exit(0)
+On the shipped `php-8.4` archive it stops at 68,299,511 of 68,318,496 bytes, every time. yauzl 3.4.0 reads it in full, and NativePHP already allows `^3.2.0` — only its committed lockfile pins the broken release, so no source changes are needed.
+
+This repository repairs it automatically after `composer install`. If you hit it anyway, run it directly:
+
+```bash
+composer fix:nativephp
 ```
 
-This edit lives in `vendor/`, so it does not survive `composer install`. A fix is going upstream.
+Reported upstream; the workaround can be deleted once NativePHP's lockfile is refreshed.
 
 **4. `native:run` needs a TTY.** In a non-interactive shell, wrap it: `script -q /dev/null php artisan native:run`.
 
