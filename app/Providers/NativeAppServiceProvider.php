@@ -4,11 +4,11 @@ namespace App\Providers;
 
 use App\Events\HudRequested;
 use App\Support\Hud;
+use App\Support\Preferences;
+use App\Support\Tray;
 use Native\Desktop\Contracts\ProvidesPhpIni;
 use Native\Desktop\Facades\ChildProcess;
 use Native\Desktop\Facades\GlobalShortcut;
-use Native\Desktop\Facades\Menu;
-use Native\Desktop\Facades\MenuBar;
 use Native\Desktop\Facades\Window;
 
 /**
@@ -20,26 +20,12 @@ class NativeAppServiceProvider implements ProvidesPhpIni
 {
     public function boot(): void
     {
-        $this->menuBar();
+        Preferences::applyToConfig();
+
+        Tray::create();
         $this->hudWindow();
         $this->shortcuts();
         $this->watcher();
-    }
-
-    private function menuBar(): void
-    {
-        MenuBar::create()
-            ->icon(resource_path('icons/menuBarIconTemplate.png'))
-            ->tooltip('laravel-clipboard')
-            ->width(360)
-            ->height(440)
-            ->vibrancy('sidebar')
-            ->route('menubar.popover')
-            ->withContextMenu(Menu::make(
-                Menu::label('laravel-clipboard — Phase 0 spike'),
-                Menu::separator(),
-                Menu::quit('Quit'),
-            ));
     }
 
     /** Created once and hidden, so summoning is a reposition plus a show. */
@@ -62,7 +48,7 @@ class NativeAppServiceProvider implements ProvidesPhpIni
 
     private function shortcuts(): void
     {
-        GlobalShortcut::key('CmdOrCtrl+Shift+V')
+        GlobalShortcut::key(Preferences::hotkey())
             ->event(HudRequested::class)
             ->register();
     }

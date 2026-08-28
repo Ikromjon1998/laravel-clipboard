@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Preferences;
 use Ikromjon\ClipboardCore\ClipboardHistory;
 use Ikromjon\ClipboardCore\Models\Clip;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +21,19 @@ class ClipController extends Controller
         return view('hud', [
             'clips' => $this->present($this->history->recent()),
             'paused' => $this->history->isPaused(),
+        ]);
+    }
+
+    /**
+     * The tray popover. Same data as the HUD, but a calmer surface: this one
+     * is browsed with a mouse rather than driven from the keyboard.
+     */
+    public function popover(): View
+    {
+        return view('menubar', [
+            'clips' => $this->present($this->history->recent()),
+            'paused' => $this->history->isPaused(),
+            'onboarded' => Preferences::hasOnboarded(),
         ]);
     }
 

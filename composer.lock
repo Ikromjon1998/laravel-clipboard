@@ -1056,16 +1056,16 @@
         },
         {
             "name": "ikromjon/laravel-clipboard-core",
-            "version": "v0.1.0",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Ikromjon1998/laravel-clipboard-core.git",
-                "reference": "ee4069951575ffe94a87fe1ec85ce7e36ce02701"
+                "reference": "89f8d2e90356f6435e46734211cb3a8996cc3d13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Ikromjon1998/laravel-clipboard-core/zipball/ee4069951575ffe94a87fe1ec85ce7e36ce02701",
-                "reference": "ee4069951575ffe94a87fe1ec85ce7e36ce02701",
+                "url": "https://api.github.com/repos/Ikromjon1998/laravel-clipboard-core/zipball/89f8d2e90356f6435e46734211cb3a8996cc3d13",
+                "reference": "89f8d2e90356f6435e46734211cb3a8996cc3d13",
                 "shasum": ""
             },
             "require": {
@@ -1118,9 +1118,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Ikromjon1998/laravel-clipboard-core/issues",
-                "source": "https://github.com/Ikromjon1998/laravel-clipboard-core/tree/v0.1.0"
+                "source": "https://github.com/Ikromjon1998/laravel-clipboard-core/tree/v0.1.1"
             },
-            "time": "2026-08-28T23:15:09+00:00"
+            "time": "2026-08-28T23:27:20+00:00"
         },
         {
             "name": "laravel/framework",

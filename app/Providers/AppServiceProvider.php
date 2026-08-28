@@ -3,9 +3,17 @@
 namespace App\Providers;
 
 use App\Events\ClipboardUpdated;
+use App\Events\HistoryClearRequested;
 use App\Events\HudRequested;
+use App\Events\PauseToggled;
+use App\Events\SettingsRequested;
 use App\Support\Hud;
+use App\Support\Preferences;
+use App\Support\SettingsWindow;
+use App\Support\Tray;
+use Ikromjon\ClipboardCore\ClipboardHistory;
 use Ikromjon\ClipboardCore\Events\ClipCaptured;
+use Ikromjon\ClipboardCore\Events\ClipsPruned;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
@@ -28,7 +36,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // The watcher process boots through here too, which is how a changed
+        // history limit reaches the engine after the watcher is restarted.
+        Preferences::applyToConfig();
+
         $this->bridgeEngineEvents();
+        $this->trayActions();
         $this->hudBehaviour();
         $this->watcherSupervision();
     }
@@ -41,7 +54,29 @@ class AppServiceProvider extends ServiceProvider
     {
         Event::listen(ClipCaptured::class, function (ClipCaptured $event): void {
             ClipboardUpdated::dispatch($event->clip);
+            Tray::refresh();
         });
+
+        Event::listen(ClipsPruned::class, fn () => Tray::refresh());
+    }
+
+    private function trayActions(): void
+    {
+        Event::listen(PauseToggled::class, function (): void {
+            $paused = app(ClipboardHistory::class)->toggle();
+
+            Log::info('watcher.pause_toggled', ['paused' => $paused]);
+            Tray::refresh();
+        });
+
+        Event::listen(HistoryClearRequested::class, function (): void {
+            $removed = app(ClipboardHistory::class)->clear();
+
+            Log::info('history.cleared', ['removed' => $removed]);
+            Tray::refresh();
+        });
+
+        Event::listen(SettingsRequested::class, fn () => SettingsWindow::open());
     }
 
     private function hudBehaviour(): void
