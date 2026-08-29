@@ -1,4 +1,5 @@
 import actions from './clip-actions'
+import { onNativeReady } from './native'
 
 /**
  * The tray popover: the same history as the palette, browsed rather than
@@ -16,7 +17,13 @@ export default (initial = [], paused = false, onboarded = true) => ({
     copiedId: null,
 
     boot() {
-        window.addEventListener('native:init', () => {
+        onNativeReady(() => {
+            Native.on('Native\\Desktop\\Events\\MenuBar\\MenuBarShown', () => {
+                this.query = ''
+                this.cursor = -1
+                this.refresh()
+            })
+
             Native.on('App\\Events\\ClipboardUpdated', (clip = {}) => {
                 this.clips = [
                     { id: clip.id, preview: clip.preview, kind: clip.kind, pinned: clip.pinned },

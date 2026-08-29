@@ -5,6 +5,30 @@
  * on it; the difference between them is navigation, not semantics.
  */
 export default {
+    /**
+     * Re-read the history from the server.
+     *
+     * Both surfaces are rendered once and then kept current by broadcasts,
+     * but a window that is closed or hidden does not reliably receive them —
+     * so whatever was copied while it was away would never appear. Showing a
+     * clipboard manager a stale history is the one thing it must not do, so
+     * every summon re-reads rather than trusting the events.
+     */
+    async refresh() {
+        try {
+            const response = await fetch('/clips', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+            })
+
+            if (!response.ok) return
+
+            const { clips } = await response.json()
+            if (Array.isArray(clips)) this.clips = clips
+        } catch {
+            // Keep showing the last known list rather than emptying it.
+        }
+    },
+
     async togglePin() {
         const clip = this.selected
         if (!clip) return
@@ -33,15 +57,28 @@ export default {
 
     async post(url, method = 'POST') {
         try {
-            await fetch(url, {
+            const response = await fetch(url, {
                 method,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '',
                 },
             })
+
+            // fetch only rejects on network failure, so an expired CSRF token
+            // or a server error arrives as a perfectly resolved promise. Left
+            // unchecked, the action simply appears to do nothing.
+            if (!response.ok) {
+                this.status = response.status === 419 ? 'session expired' : `failed (${response.status})`
+
+                return false
+            }
+
+            return true
         } catch {
-            this.status = 'action failed'
+            this.status = 'no connection'
+
+            return false
         }
     },
 }

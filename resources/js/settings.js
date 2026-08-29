@@ -5,6 +5,8 @@
  * nothing here worth staging, and a settings window that can be closed in a
  * dirty state is a way to lose someone's preferences.
  */
+import { onNativeReady } from './native'
+
 export default (initial = {}, onboarded = false) => ({
     form: { ...initial },
     onboarded,
@@ -15,7 +17,7 @@ export default (initial = {}, onboarded = false) => ({
     confirmTimer: null,
 
     boot() {
-        window.addEventListener('native:init', () => {
+        onNativeReady(() => {
             // Another surface (the tray menu) can change the same state, so
             // re-read it whenever this window is brought forward.
             Native.on('Native\\Desktop\\Events\\Windows\\WindowFocused', () => this.refresh())

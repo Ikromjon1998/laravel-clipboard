@@ -1,4 +1,5 @@
 import actions from './clip-actions'
+import { onNativeReady } from './native'
 
 /**
  * The palette's filter path runs entirely in memory: the window is pre-warmed
@@ -18,7 +19,7 @@ export default (initial = [], paused = false) => ({
     boot() {
         this.focusSearch()
 
-        window.addEventListener('native:init', () => {
+        onNativeReady(() => {
             this.status = 'listening'
 
             Native.on('App\\Events\\ClipboardUpdated', (clip = {}) => {
@@ -34,6 +35,7 @@ export default (initial = [], paused = false) => ({
                 this.query = ''
                 this.cursor = 0
                 this.focusSearch()
+                this.refresh()
             })
         })
     },
@@ -69,8 +71,13 @@ export default (initial = [], paused = false) => ({
         const clip = this.selected
         if (!clip) return
 
-        this.dismiss()
-        await this.post(`/clips/${clip.id}/use`)
+        // Put the clip on the clipboard *before* hiding. Hiding first felt
+        // faster, but a hidden Electron window has its renderer throttled, so
+        // the request could stall and the paste silently never happened. On
+        // loopback this costs a couple of milliseconds.
+        const ok = await this.post(`/clips/${clip.id}/use`)
+
+        if (ok) this.dismiss()
     },
 
     dismiss() {
