@@ -90,6 +90,29 @@ Two conventions matter if you are reading the code:
 - **Event listeners belong in `AppServiceProvider`, not `NativeAppServiceProvider`.** Electron delivers native events as ordinary HTTP requests, so listeners registered in the boot-only provider never fire. This is not in the NativePHP docs.
 - **The HUD is pre-warmed.** It is created once at boot and hidden, so summoning it is a reposition plus a show — measured at 4–13 ms rather than the cost of building a window.
 
+## Building a release
+
+```bash
+composer build:mac
+```
+
+That builds the pasteboard probe, regenerates the icon, compiles assets, and packages the app — producing a `.dmg`, a `.zip`, and `latest-mac.yml` (the manifest the auto-updater reads) in `nativephp/electron/dist/`.
+
+Without Apple credentials the build still succeeds, but falls back to an **ad-hoc signature**. Such a build runs only on the machine that produced it; anywhere else macOS reports *"app is damaged and can't be opened"*. To distribute it you need an [Apple Developer Program](https://developer.apple.com/programs/) membership ($99/year), then in `.env`:
+
+```
+NATIVEPHP_APPLE_ID=you@example.com
+NATIVEPHP_APPLE_ID_PASS=xxxx-xxxx-xxxx-xxxx   # app-specific password
+NATIVEPHP_APPLE_TEAM_ID=XXXXXXXXXX
+```
+
+With those present the same command signs with your Developer ID, submits to Apple for notarization, and staples the result.
+
+Two things to keep straight when releasing:
+
+- **Bump `NATIVEPHP_APP_VERSION`.** The updater compares versions, so shipping twice with the same one means nobody updates.
+- **Do not change `NATIVEPHP_APP_ID`.** macOS keys preferences, permissions and update eligibility to it; changing it orphans every existing install.
+
 ## Development
 
 ```bash

@@ -104,7 +104,63 @@ class Preferences
     /** Apply stored preferences over the package defaults. */
     public static function applyToConfig(): void
     {
-        config(['clipboard.limit' => self::historyLimit()]);
+        // Asking whether it is available also repairs a lost executable bit,
+        // so this runs before the command is handed to the engine.
+        $probe = self::probeIsAvailable() ? self::probeCommand() : [];
+
+        config([
+            'clipboard.limit' => self::historyLimit(),
+            'clipboard.probe.command' => $probe,
+        ]);
+    }
+
+    /**
+     * Where the native pasteboard probe lives.
+     *
+     * Resolved at runtime rather than stored as a path, because the app moves:
+     * a packaged build lives wherever the user dragged it, and a baked-in
+     * absolute path would simply not exist there. The engine treats a missing
+     * probe as "no probe", so getting this wrong does not crash the app — it
+     * quietly turns off the protection that keeps password managers out of the
+     * history, which is far worse than a crash.
+     *
+     * @return list<string>
+     */
+    public static function probeCommand(): array
+    {
+        $configured = env('CLIPBOARD_PROBE_COMMAND');
+
+        if (is_string($configured) && trim($configured) !== '') {
+            return array_values(array_filter(explode(' ', trim($configured))));
+        }
+
+        return [base_path('bin/clipboard-probe'), '--interval-ms', '150'];
+    }
+
+    public static function probeIsAvailable(): bool
+    {
+        $command = self::probeCommand();
+
+        if ($command === []) {
+            return false;
+        }
+
+        $path = $command[0];
+
+        if (is_executable($path)) {
+            return true;
+        }
+
+        // A packaged build reaches the user's disk through two copies, and
+        // neither reliably preserves the executable bit. Restoring it here is
+        // cheaper than shipping an app whose privacy protection is off for
+        // reasons nobody can see.
+        if (is_file($path)) {
+            @chmod($path, 0o755);
+            clearstatcache(true, $path);
+        }
+
+        return is_executable($path);
     }
 
     private static function read(string $key): mixed

@@ -87,6 +87,15 @@
         ],
         "build:probe": [
             "@php scripts/build-clipboard-probe.php"
+        ],
+        "build:icon": [
+            "@php scripts/build-app-icon.php"
+        ],
+        "build:mac": [
+            "@php scripts/build-clipboard-probe.php",
+            "@php scripts/build-app-icon.php",
+            "npm run build",
+            "@php artisan native:build mac arm64"
         ]
     },
     "extra": {
