@@ -40,31 +40,28 @@ The clipboard engine is a published package — [`ikromjon/laravel-clipboard-cor
 ## Getting it running
 
 ```bash
-composer install
-npm install
-npm run build
-php artisan native:migrate    # NOT `php artisan migrate` — see below
+git clone https://github.com/Ikromjon1998/laravel-clipboard.git
+cd laravel-clipboard
+composer setup
 php artisan native:run
 ```
 
-### Known setup issues
+`composer setup` creates `.env`, generates an application key, installs both dependency trees, works around the toolchain bugs described below, builds the pasteboard probe, compiles assets and migrates the app database. It is safe to re-run at any time.
 
-These are rough edges in the toolchain, not in this app. Each one cost real debugging time, so they are written down.
+The first run downloads an Electron runtime of about 110 MB, so give it a few minutes.
 
-**1. `php artisan migrate` migrates the wrong database.** NativePHP uses its own `nativephp` connection. Use `php artisan native:migrate`, or you will migrate `database/database.sqlite` and the app will report `no such table: clips`.
+### Known toolchain issues
 
-**2. Electron's binary may not download.** This project ships an `.npmrc` with `ignore-scripts=true`, so npm will not run package install scripts — including the one that downloads the Electron binary. If `native:run` cannot find Electron:
+These are rough edges in the toolchain, not in this app. `composer setup` already handles them — they are written down because each one cost real debugging time, and because the errors they produce name the wrong culprit.
 
-```bash
-cd vendor/nativephp/desktop/resources/electron
-npm install-scripts approve electron esbuild fsevents
-```
+**1. `php artisan migrate` migrates the wrong database.** NativePHP uses its own `nativephp` connection, pointed at a database in your application-data directory. Use `php artisan native:migrate`, or you will migrate `database/database.sqlite` instead and the app will start and then report `no such table: clips`.
 
-**3. The bundled PHP binary can be extracted truncated (`spawn … EACCES`).** NativePHP unzips the static PHP binary with yauzl, and **yauzl 3.2.0 stalls partway through a large deflated entry** — it stops emitting data and never fires `end`, `error` or `close`. Because the file mode is set inside that `close` handler, the binary is left both short and non-executable, so Electron cannot spawn it. The error names permissions, but the cause is extraction.
+**2. Two archives are extracted with a broken unzipper.** NativePHP unzips with yauzl, and **yauzl stalls partway through inflating a large deflated entry** — it stops emitting data and never fires `end`, `error` or `close`. Two things in the install path go through it, and neither reports the real fault:
 
-On the shipped `php-8.4` archive it stops at 68,299,511 of 68,318,496 bytes, every time. yauzl 3.4.0 reads it in full, and NativePHP already allows `^3.2.0` — only its committed lockfile pins the broken release, so no source changes are needed.
+- **The bundled PHP binary**, via the top-level yauzl 3.2.0. The file mode is set inside the `close` handler that never runs, so the binary is left both short and non-executable. On the shipped `php-8.4` archive it stops at 68,299,511 of 68,318,496 bytes, every time. The app dies at boot with `spawn … EACCES`, which points at permissions rather than at the extraction.
+- **The Electron runtime**, via `extract-zip`. That package carries its own nested yauzl 2.10.0, and Node resolves a nested copy in preference to the fixed top-level one — so upgrading the top-level version alone does not reach it. It writes the first entry of the archive and stops, leaving a `dist/` that contains `LICENSES.chromium.html` and nothing else while `install.js` still exits 0. The app then fails with a missing `Electron.app/Contents/Info.plist`.
 
-This repository repairs it automatically after `composer install`. If you hit it anyway, run it directly:
+yauzl 3.4.0 reads both archives in full, and NativePHP's `package.json` already allows `^3.2.0` — only its committed lockfile pins the broken release, so no source changes are needed. `composer setup` installs the fixed version, removes the nested copy so `extract-zip` resolves it too, and re-extracts the runtime if it was truncated. To run that repair on its own:
 
 ```bash
 composer fix:nativephp
@@ -72,7 +69,7 @@ composer fix:nativephp
 
 Reported upstream; the workaround can be deleted once NativePHP's lockfile is refreshed.
 
-**4. `native:run` needs a TTY.** In a non-interactive shell, wrap it: `script -q /dev/null php artisan native:run`.
+**3. `native:run` needs a TTY.** In a non-interactive shell, wrap it: `script -q /dev/null php artisan native:run`.
 
 ## Architecture
 

@@ -41,9 +41,12 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan migrate --force",
-            "npm install --ignore-scripts",
-            "npm run build"
+            "npm install",
+            "@php artisan native:install --force --no-interaction",
+            "@php scripts/ensure-nativephp-yauzl.php",
+            "@php scripts/build-clipboard-probe.php",
+            "npm run build",
+            "@php artisan native:migrate --force"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
